@@ -124,9 +124,6 @@ class ExtendibleHashTable : public HashTable<K, V> {
     inline auto GetItems() -> std::list<std::pair<K, V>> & { return list_; }
 
     /**
-     *
-     * TODO(P1): Add implementation
-     *
      * @brief Find the value associated with the given key in the bucket.
      * @param key The key to be searched.
      * @param[out] value The value associated with the key.
@@ -135,9 +132,6 @@ class ExtendibleHashTable : public HashTable<K, V> {
     auto Find(const K &key, V &value) -> bool;
 
     /**
-     *
-     * TODO(P1): Add implementation
-     *
      * @brief Given the key, remove the corresponding key-value pair in the bucket.
      * @param key The key to be deleted.
      * @return True if the key exists, false otherwise.
@@ -145,9 +139,6 @@ class ExtendibleHashTable : public HashTable<K, V> {
     auto Remove(const K &key) -> bool;
 
     /**
-     *
-     * TODO(P1): Add implementation
-     *
      * @brief Insert the given key-value pair into the bucket.
      *      1. If a key already exists, the value should be updated.
      *      2. If the bucket is full, do nothing and return false.

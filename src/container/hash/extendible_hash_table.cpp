@@ -10,6 +10,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
 #include <cassert>
 #include <cstdlib>
 #include <functional>
@@ -66,12 +67,20 @@ auto ExtendibleHashTable<K, V>::GetNumBucketsInternal() const -> int {
 
 template <typename K, typename V>
 auto ExtendibleHashTable<K, V>::Find(const K &key, V &value) -> bool {
-  UNREACHABLE("not implemented");
+  auto key_hash = IndexOf(key);
+  std::scoped_lock<std::mutex> lock(latch_);
+  auto dir_idx = key_hash & ((1 << global_depth_) - 1);
+  auto bucket_p = dir_[dir_idx];
+  return bucket_p->Find(key, value);
 }
 
 template <typename K, typename V>
 auto ExtendibleHashTable<K, V>::Remove(const K &key) -> bool {
-  UNREACHABLE("not implemented");
+  auto key_hash = IndexOf(key);
+  std::scoped_lock<std::mutex> lock(latch_);
+  auto dir_idx = key_hash & ((1 << global_depth_) - 1);
+  auto bucket_p = dir_[dir_idx];
+  return bucket_p->Remove(key);
 }
 
 template <typename K, typename V>
@@ -87,17 +96,30 @@ ExtendibleHashTable<K, V>::Bucket::Bucket(size_t array_size, int depth) : size_(
 
 template <typename K, typename V>
 auto ExtendibleHashTable<K, V>::Bucket::Find(const K &key, V &value) -> bool {
-  UNREACHABLE("not implemented");
+  return std::find(list_.begin(), list_.end(), std::make_pair(key, value)) != list_.end();
 }
 
 template <typename K, typename V>
 auto ExtendibleHashTable<K, V>::Bucket::Remove(const K &key) -> bool {
-  UNREACHABLE("not implemented");
+  auto entry = std::find_if(list_.begin(), list_.end(), [&key](const auto &pair) { return pair.first == key; });
+  if (entry == list_.end()) {
+    return false;
+  }
+  list_.erase(entry);
+  return true;
 }
 
 template <typename K, typename V>
 auto ExtendibleHashTable<K, V>::Bucket::Insert(const K &key, const V &value) -> bool {
-  UNREACHABLE("not implemented");
+  if (IsFull()) {
+    return false;
+  }
+  auto p = std::make_pair(key, value);
+  auto entry = std::find(list_.begin(), list_.end(), p);
+  if (entry != list_.end()) {
+    list_.insert(entry, p);
+  }
+  return true;
 }
 
 template class ExtendibleHashTable<page_id_t, Page *>;
