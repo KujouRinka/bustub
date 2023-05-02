@@ -111,13 +111,16 @@ auto ExtendibleHashTable<K, V>::Bucket::Remove(const K &key) -> bool {
 
 template <typename K, typename V>
 auto ExtendibleHashTable<K, V>::Bucket::Insert(const K &key, const V &value) -> bool {
-  if (IsFull()) {
-    return false;
-  }
-  auto p = std::make_pair(key, value);
-  auto entry = std::find(list_.begin(), list_.end(), p);
+  auto entry = std::find_if(list_.begin(), list_.end(), [&key](const auto &pair) { return pair.first == key; });
   if (entry != list_.end()) {
-    list_.insert(entry, p);
+    // do update
+    entry->second = value;
+  } else if (!IsFull()) {
+    // do insert
+    list_.emplace_back(key, value);
+  } else {
+    // full
+    return false;
   }
   return true;
 }
