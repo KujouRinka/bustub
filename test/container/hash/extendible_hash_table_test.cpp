@@ -10,7 +10,7 @@
 
 namespace bustub {
 
-TEST(ExtendibleHashTableTest, DISABLED_SampleTest) {
+TEST(ExtendibleHashTableTest, SampleTest) {
   auto table = std::make_unique<ExtendibleHashTable<int, std::string>>(2);
 
   table->Insert(1, "a");
@@ -36,13 +36,36 @@ TEST(ExtendibleHashTableTest, DISABLED_SampleTest) {
   EXPECT_EQ("b", result);
   EXPECT_FALSE(table->Find(10, result));
 
+  table->Insert(9, "j");
+  table->Insert(9, "k");
+  table->Insert(9, "j");
+  table->Insert(9, "q");
+  table->Insert(1, "c");
+  table->Insert(1, "d");
+  table->Insert(4, "e");
+
+  table->Find(9, result);
+  EXPECT_EQ("q", result);
+  table->Find(1, result);
+  EXPECT_EQ("d", result);
+  table->Find(4, result);
+  EXPECT_EQ("e", result);
+
   EXPECT_TRUE(table->Remove(8));
   EXPECT_TRUE(table->Remove(4));
   EXPECT_TRUE(table->Remove(1));
+  EXPECT_TRUE(table->Remove(9));
   EXPECT_FALSE(table->Remove(20));
+  EXPECT_FALSE(table->Remove(8));
+
+  EXPECT_FALSE(table->Find(8, result));
+  EXPECT_FALSE(table->Find(4, result));
+  EXPECT_FALSE(table->Find(1, result));
+  EXPECT_FALSE(table->Find(9, result));
+  EXPECT_FALSE(table->Find(20, result));
 }
 
-TEST(ExtendibleHashTableTest, DISABLED_ConcurrentInsertTest) {
+TEST(ExtendibleHashTableTest, ConcurrentInsertTest) {
   const int num_runs = 50;
   const int num_threads = 3;
 
