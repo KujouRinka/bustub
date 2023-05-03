@@ -36,9 +36,6 @@ template <typename K, typename V>
 class ExtendibleHashTable : public HashTable<K, V> {
  public:
   /**
-   *
-   * TODO(P1): Add implementation
-   *
    * @brief Create a new ExtendibleHashTable.
    * @param bucket_size: fixed size for each bucket
    */
@@ -156,14 +153,6 @@ class ExtendibleHashTable : public HashTable<K, V> {
   int num_buckets_;     // The number of buckets in the hash table
   mutable std::mutex latch_;
   std::vector<std::shared_ptr<Bucket>> dir_;  // The directory of the hash table
-
-  // The following functions are completely optional, you can delete them if you have your own ideas.
-
-  /**
-   * @brief Redistribute the kv pairs in a full bucket.
-   * @param bucket The bucket to be redistributed.
-   */
-  auto RedistributeBucket(std::shared_ptr<Bucket> bucket) -> void;
 
   /*****************************************************************
    * Must acquire latch_ first before calling the below functions. *
