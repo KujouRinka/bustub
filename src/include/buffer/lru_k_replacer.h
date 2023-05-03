@@ -86,8 +86,6 @@ class LRUKReplacer {
   void RecordAccess(frame_id_t frame_id);
 
   /**
-   * TODO(P1): Add implementation
-   *
    * @brief Toggle whether a frame is evictable or non-evictable. This function also
    * controls replacer's size. Note that size is equal to number of evictable entries.
    *
@@ -105,8 +103,6 @@ class LRUKReplacer {
   void SetEvictable(frame_id_t frame_id, bool set_evictable);
 
   /**
-   * TODO(P1): Add implementation
-   *
    * @brief Remove an evictable frame from replacer, along with its access history.
    * This function should also decrement replacer's size if removal is successful.
    *
@@ -124,8 +120,6 @@ class LRUKReplacer {
   void Remove(frame_id_t frame_id);
 
   /**
-   * TODO(P1): Add implementation
-   *
    * @brief Return replacer's size, which tracks the number of evictable frames.
    *
    * @return size_t
@@ -137,9 +131,20 @@ class LRUKReplacer {
   // Remove maybe_unused if you start using them.
   [[maybe_unused]] size_t current_timestamp_{0};
   [[maybe_unused]] size_t curr_size_{0};
-  [[maybe_unused]] size_t replacer_size_;
-  [[maybe_unused]] size_t k_;
+  size_t evictable_cnt_{0};
+  size_t replacer_size_;
+  size_t k_;
   std::mutex latch_;
+
+  struct FrameRec {
+    frame_id_t frame_id_;
+    size_t visit_cnt_;
+    bool evictable_;
+  };
+
+  std::unordered_map<frame_id_t, std::list<FrameRec>::iterator> rec_map_;
+  std::list<FrameRec> history_list_;
+  std::list<FrameRec> buffer_list_;
 };
 
 }  // namespace bustub
