@@ -64,9 +64,6 @@ class ExtendibleHashTable : public HashTable<K, V> {
   auto GetNumBuckets() const -> int;
 
   /**
-   *
-   * TODO(P1): Add implementation
-   *
    * @brief Find the value associated with the given key.
    *
    * Use IndexOf(key) to find the directory index the key hashes to.
@@ -78,9 +75,6 @@ class ExtendibleHashTable : public HashTable<K, V> {
   auto Find(const K &key, V &value) -> bool override;
 
   /**
-   *
-   * TODO(P1): Add implementation
-   *
    * @brief Insert the given key-value pair into the hash table.
    * If a key already exists, the value should be updated.
    * If the bucket is full and can't be inserted, do the following steps before retrying:
@@ -95,9 +89,6 @@ class ExtendibleHashTable : public HashTable<K, V> {
   void Insert(const K &key, const V &value) override;
 
   /**
-   *
-   * TODO(P1): Add implementation
-   *
    * @brief Given the key, remove the corresponding key-value pair in the hash table.
    * Shrink & Combination is not required for this project
    * @param key The key to be deleted.
@@ -110,7 +101,7 @@ class ExtendibleHashTable : public HashTable<K, V> {
    */
   class Bucket {
    public:
-    explicit Bucket(size_t size, int depth = 0);
+    explicit Bucket(size_t size, size_t self_hash, int depth);
 
     /** @brief Check if a bucket is full. */
     inline auto IsFull() const -> bool { return list_.size() == size_; }
@@ -148,15 +139,16 @@ class ExtendibleHashTable : public HashTable<K, V> {
      */
     auto Insert(const K &key, const V &value) -> bool;
 
+    auto GetSelfHash() const -> size_t;
+
    private:
-    // TODO(student): You may add additional private members and helper functions
     size_t size_;
+    size_t self_hash_;
     int depth_;
     std::list<std::pair<K, V>> list_;
   };
 
  private:
-  // TODO(student): You may add additional private members and helper functions and remove the ones
   // you don't need.
 
   int global_depth_;    // The global depth of the directory
@@ -187,6 +179,9 @@ class ExtendibleHashTable : public HashTable<K, V> {
   auto GetGlobalDepthInternal() const -> int;
   auto GetLocalDepthInternal(int dir_index) const -> int;
   auto GetNumBucketsInternal() const -> int;
+
+  auto SplitBucket(std::shared_ptr<Bucket> bucket) -> bool;
+  auto ExpandDirs() -> bool;
 };
 
 }  // namespace bustub
