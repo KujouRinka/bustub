@@ -17,11 +17,15 @@ namespace bustub {
 LRUKReplacer::LRUKReplacer(size_t num_frames, size_t k) : replacer_size_(num_frames), k_(k) {}
 
 auto LRUKReplacer::Evict(frame_id_t *frame_id) -> bool {
-  if (Size() == 0) {
+  std::scoped_lock<std::mutex> lock(latch_);
+  return EvictInternal(frame_id);
+}
+
+auto LRUKReplacer::EvictInternal(frame_id_t *frame_id) -> bool {
+  if (evictable_cnt_ == 0) {
     *frame_id = -1;
     return false;
   }
-  std::scoped_lock<std::mutex> lock(latch_);
   for (auto it = history_list_.begin(); it != history_list_.end(); ++it) {
     if (it->evictable_) {
       *frame_id = it->frame_id_;
@@ -56,26 +60,21 @@ void LRUKReplacer::RecordAccess(frame_id_t frame_id) {
       if (++rec->visit_cnt_ == k_) {
         buffer_list_.push_back(*rec);
         history_list_.erase(rec);
-        // *rec = buffer_list_.back();
-        rec_map_[frame_id] = prev(buffer_list_.end());
+        it->second = prev(buffer_list_.end());
       }
     } else {
       // in buffer_list_, move it to head
       // buffer_list_ uses LRU
       buffer_list_.push_back(*rec);
       buffer_list_.erase(rec);
-      // *rec = buffer_list_.back();
-      rec_map_[frame_id] = prev(buffer_list_.end());
+      it->second = prev(buffer_list_.end());
     }
     return;
   }
   // newcomer
   if (buffer_list_.size() + history_list_.size() == replacer_size_) {
-    if (evictable_cnt_ == 0) {
-      assert(0);
-    }
-    // evict
-    UNIMPLEMENTED("evict");
+    // frame_id_t id;
+    // BUSTUB_ASSERT(EvictInternal(&id), "cannot evict");
   }
   auto to_add = FrameRec{frame_id, 1, false};
   history_list_.push_back(to_add);
@@ -85,7 +84,10 @@ void LRUKReplacer::RecordAccess(frame_id_t frame_id) {
 void LRUKReplacer::SetEvictable(frame_id_t frame_id, bool set_evictable) {
   std::scoped_lock<std::mutex> lock(latch_);
   auto it = rec_map_.find(frame_id);
-  assert(it != rec_map_.end());
+  if (it == rec_map_.end()) {
+    // not found
+    return;
+  }
   auto &rec = it->second;
   if ((set_evictable ^ rec->evictable_) == 0) {
     return;

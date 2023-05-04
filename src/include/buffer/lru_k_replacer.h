@@ -38,8 +38,6 @@ class LRUKReplacer {
  public:
   /**
    *
-   * TODO(P1): Add implementation
-   *
    * @brief a new LRUKReplacer.
    * @param num_frames the maximum number of frames the LRUReplacer will be required to store
    */
@@ -48,15 +46,11 @@ class LRUKReplacer {
   DISALLOW_COPY_AND_MOVE(LRUKReplacer);
 
   /**
-   * TODO(P1): Add implementation
-   *
    * @brief Destroys the LRUReplacer.
    */
   ~LRUKReplacer() = default;
 
   /**
-   * TODO(P1): Add implementation
-   *
    * @brief Find the frame with largest backward k-distance and evict that frame. Only frames
    * that are marked as 'evictable' are candidates for eviction.
    *
@@ -73,8 +67,6 @@ class LRUKReplacer {
   auto Evict(frame_id_t *frame_id) -> bool;
 
   /**
-   * TODO(P1): Add implementation
-   *
    * @brief Record the event that the given frame id is accessed at current timestamp.
    * Create a new entry for access history if frame id has not been seen before.
    *
@@ -127,10 +119,7 @@ class LRUKReplacer {
   auto Size() -> size_t;
 
  private:
-  // TODO(student): implement me! You can replace these member variables as you like.
   // Remove maybe_unused if you start using them.
-  [[maybe_unused]] size_t current_timestamp_{0};
-  [[maybe_unused]] size_t curr_size_{0};
   size_t evictable_cnt_{0};
   size_t replacer_size_;
   size_t k_;
@@ -145,6 +134,8 @@ class LRUKReplacer {
   std::unordered_map<frame_id_t, std::list<FrameRec>::iterator> rec_map_;
   std::list<FrameRec> history_list_;
   std::list<FrameRec> buffer_list_;
+
+  auto EvictInternal(frame_id_t *frame_id) -> bool;
 };
 
 }  // namespace bustub
