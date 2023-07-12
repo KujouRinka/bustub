@@ -50,12 +50,13 @@ class BufferPoolManagerInstance : public BufferPoolManager {
   auto GetPoolSize() -> size_t override { return pool_size_; }
 
   /** @brief Return the pointer to all the pages in the buffer pool. */
-  auto GetPages() -> Page * { return pages_; }
+  auto GetPages() -> Page * {
+    std::lock_guard<std::mutex> guard(latch_);
+    return pages_;
+  }
 
  protected:
   /**
-   * TODO(P1): Add implementation
-   *
    * @brief Create a new page in the buffer pool. Set page_id to the new page's id, or nullptr if all frames
    * are currently in use and not evictable (in another word, pinned).
    *
@@ -73,8 +74,6 @@ class BufferPoolManagerInstance : public BufferPoolManager {
   auto NewPgImp(page_id_t *page_id) -> Page * override;
 
   /**
-   * TODO(P1): Add implementation
-   *
    * @brief Fetch the requested page from the buffer pool. Return nullptr if page_id needs to be fetched from the disk
    * but all frames are currently in use and not evictable (in another word, pinned).
    *
@@ -91,8 +90,6 @@ class BufferPoolManagerInstance : public BufferPoolManager {
   auto FetchPgImp(page_id_t page_id) -> Page * override;
 
   /**
-   * TODO(P1): Add implementation
-   *
    * @brief Unpin the target page from the buffer pool. If page_id is not in the buffer pool or its pin count is already
    * 0, return false.
    *
@@ -106,8 +103,6 @@ class BufferPoolManagerInstance : public BufferPoolManager {
   auto UnpinPgImp(page_id_t page_id, bool is_dirty) -> bool override;
 
   /**
-   * TODO(P1): Add implementation
-   *
    * @brief Flush the target page to disk.
    *
    * Use the DiskManager::WritePage() method to flush a page to disk, REGARDLESS of the dirty flag.
@@ -119,15 +114,11 @@ class BufferPoolManagerInstance : public BufferPoolManager {
   auto FlushPgImp(page_id_t page_id) -> bool override;
 
   /**
-   * TODO(P1): Add implementation
-   *
    * @brief Flush all the pages in the buffer pool to disk.
    */
   void FlushAllPgsImp() override;
 
   /**
-   * TODO(P1): Add implementation
-   *
    * @brief Delete a page from the buffer pool. If page_id is not in the buffer pool, do nothing and return true. If the
    * page is pinned and cannot be deleted, return false immediately.
    *
@@ -177,5 +168,12 @@ class BufferPoolManagerInstance : public BufferPoolManager {
   }
 
   // TODO(student): You may add additional private members and helper functions
+  auto FlushPgImpInternal(page_id_t page_id) -> bool;
+  auto NewPgImpInternal(page_id_t *page_id) -> Page *;
+  /**
+   * @brief Return the frame id of a free frame. Caller should acquire the latch before calling this function.
+   * @return -1 if no free frame exists, otherwise the frame id of a free frame
+   */
+  auto AllocFrameIdInternal() -> frame_id_t;
 };
 }  // namespace bustub
