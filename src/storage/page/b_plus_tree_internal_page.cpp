@@ -9,6 +9,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
 #include <iostream>
 #include <sstream>
 
@@ -33,6 +34,11 @@ void B_PLUS_TREE_INTERNAL_PAGE_TYPE::Init(page_id_t page_id, page_id_t parent_id
   SetParentPageId(parent_id);
   SetPageId(page_id);
   SetLSN();
+  // set all the pairs to invalid
+  for (int i = 0; i < max_size; i++) {
+    array_[i].first = KeyType();
+    array_[i].second = INVALID_PAGE_ID;
+  }
 }
 /*
  * Helper method to get/set the key associated with input "index"(a.k.a
@@ -50,6 +56,42 @@ void B_PLUS_TREE_INTERNAL_PAGE_TYPE::SetKeyAt(int index, const KeyType &key) { a
  */
 INDEX_TEMPLATE_ARGUMENTS
 auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::ValueAt(int index) const -> ValueType { return array_[index + 1].second; }
+
+INDEX_TEMPLATE_ARGUMENTS
+auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::KeyForSearch(const KeyType &key) -> MappingType {
+  return MappingType(key, INVALID_PAGE_ID);
+}
+
+INDEX_TEMPLATE_ARGUMENTS
+auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::LowerBoundOfKey(const KeyType &key, const KeyComparator &comparator) -> int {
+  auto begin = array_ + 1;
+  auto end = array_ + 1 + GetSize();
+  auto it = std::lower_bound(begin, end, KeyForSearch(key), [comparator](const MappingType &a, const MappingType &b) {
+    return comparator(a.first, b.first) < 0;
+  });
+  return std::distance(begin, it);
+}
+
+INDEX_TEMPLATE_ARGUMENTS
+auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::UpperBoundOfKey(const KeyType &key, const KeyComparator &comparator) -> int {
+  auto begin = array_ + 1;
+  auto end = array_ + 1 + GetSize();
+  auto it = std::upper_bound(begin, end, KeyForSearch(key), [comparator](const MappingType &a, const MappingType &b) {
+    return comparator(a.first, b.first) < 0;
+  });
+  return std::distance(begin, it);
+}
+
+INDEX_TEMPLATE_ARGUMENTS
+void B_PLUS_TREE_INTERNAL_PAGE_TYPE::Insert(const KeyType &key, const ValueType &value,
+                                            const KeyComparator &comparator) {
+  UNIMPLEMENTED("BPlusTreeInternalPage::Insert() is not implemented.");
+}
+
+INDEX_TEMPLATE_ARGUMENTS
+void B_PLUS_TREE_INTERNAL_PAGE_TYPE::Remove(const KeyType &key, const KeyComparator &comparator) {
+  UNIMPLEMENTED("BPlusTreeInternalPage::Remove() is not implemented.");
+}
 
 // valuetype for internalNode should be page id_t
 template class BPlusTreeInternalPage<GenericKey<4>, page_id_t, GenericComparator<4>>;

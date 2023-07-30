@@ -42,6 +42,13 @@ class BPlusTreeInternalPage : public BPlusTreePage {
   void SetKeyAt(int index, const KeyType &key);
   auto ValueAt(int index) const -> ValueType;
 
+  auto KeyForSearch(const KeyType &key) -> MappingType;
+  auto LowerBoundOfKey(const KeyType &key, const KeyComparator &comparator) -> int;
+  auto UpperBoundOfKey(const KeyType &key, const KeyComparator &comparator) -> int;
+
+  void Insert(const KeyType &key, const ValueType &value, const KeyComparator &comparator);
+  void Remove(const KeyType &key, const KeyComparator &comparator);
+
  private:
   // Flexible array member for page data.
   MappingType array_[1];

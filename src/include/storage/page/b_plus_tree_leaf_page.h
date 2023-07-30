@@ -50,6 +50,14 @@ class BPlusTreeLeafPage : public BPlusTreePage {
   void SetNextPageId(page_id_t next_page_id);
   auto KeyAt(int index) const -> KeyType;
 
+  auto KeyForSearch(const KeyType &key) -> MappingType;
+  auto LowerBoundOfKey(const KeyType &key, const KeyComparator &comparator) -> int;
+  auto UpperBoundOfKey(const KeyType &key, const KeyComparator &comparator) -> int;
+  auto EqualRangeOfKey(const KeyType &key, const KeyComparator &comparator) -> std::vector<ValueType>;
+
+  auto Insert(const KeyType &key, const ValueType &value, const KeyComparator &comparator) -> bool;
+  auto Remove(const KeyType &key, const KeyComparator &comparator) -> bool;
+
  private:
   page_id_t next_page_id_;
   // Flexible array member for page data.
