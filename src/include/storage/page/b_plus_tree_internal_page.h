@@ -46,8 +46,12 @@ class BPlusTreeInternalPage : public BPlusTreePage {
   auto LowerBoundOfKey(const KeyType &key, const KeyComparator &comparator) -> int;
   auto UpperBoundOfKey(const KeyType &key, const KeyComparator &comparator) -> int;
 
-  void Insert(const KeyType &key, const ValueType &value, const KeyComparator &comparator);
+  void Insert(const KeyType &key, const ValueType &value, const KeyComparator &comparator, bool *need_split);
   void Remove(const KeyType &key, const KeyComparator &comparator);
+  void MoveHalfTo(BPlusTreeInternalPage *new_node);
+
+  template <typename It>
+  void FillWith(It begin, It end, int offset = 0);
 
  private:
   // Flexible array member for page data.

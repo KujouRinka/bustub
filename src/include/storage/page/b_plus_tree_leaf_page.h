@@ -55,8 +55,12 @@ class BPlusTreeLeafPage : public BPlusTreePage {
   auto UpperBoundOfKey(const KeyType &key, const KeyComparator &comparator) -> int;
   auto EqualRangeOfKey(const KeyType &key, const KeyComparator &comparator) -> std::vector<ValueType>;
 
-  auto Insert(const KeyType &key, const ValueType &value, const KeyComparator &comparator) -> bool;
+  auto Insert(const KeyType &key, const ValueType &value, const KeyComparator &comparator, bool *need_split) -> bool;
   auto Remove(const KeyType &key, const KeyComparator &comparator) -> bool;
+  void MoveHalfTo(BPlusTreeLeafPage *new_node);
+
+  template <typename It>
+  void FillWith(It begin, It end, int offset = 0);
 
  private:
   page_id_t next_page_id_;
