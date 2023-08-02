@@ -19,7 +19,7 @@ namespace bustub {
  */
 auto BPlusTreePage::IsLeafPage() const -> bool { return page_type_ == IndexPageType::LEAF_PAGE; }
 auto BPlusTreePage::IsRootPage() const -> bool {
-  return page_type_ == IndexPageType::INTERNAL_PAGE && parent_page_id_ == INVALID_PAGE_ID;
+  return parent_page_id_ == INVALID_PAGE_ID;
 }
 void BPlusTreePage::SetPageType(IndexPageType page_type) {
   BUSTUB_ASSERT(page_type == IndexPageType::LEAF_PAGE || page_type == IndexPageType::INTERNAL_PAGE,
